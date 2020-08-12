@@ -6,7 +6,7 @@ displayUsers();
 
 
 function displayUsers() {
-    httpGet('/api/users/all')
+    Http.Get('/api/users/all')
         .then(response => response.json())
         .then((response) => {
             var allUsers = response.users;
@@ -70,6 +70,8 @@ document.addEventListener('click', function (event) {
         submitEdit(ele);
     } else if (ele.matches('.delete-user-btn')) {
         deleteUser(ele);
+    } else if (ele.matches('#logout-btn')) {
+        logoutUser();
     }
 }, false)
 
@@ -83,7 +85,7 @@ function addUser() {
             email: emailInput.value
         },
     };
-    httpPost('/api/users/add', data)
+    Http.Post('/api/users/add', data)
         .then(() => {
             displayUsers();
         })
@@ -118,7 +120,7 @@ function submitEdit(ele) {
             id: id
         }
     };
-	httpPut('/api/users/update', data)
+	Http.Put('/api/users/update', data)
         .then(() => {
             displayUsers();
         })
@@ -127,45 +129,19 @@ function submitEdit(ele) {
 
 function deleteUser(ele) {
     var id = ele.getAttribute('data-user-id');
-	httpDelete('/api/users/delete/' + id)
+	Http.Delete('/api/users/delete/' + id)
         .then(() => {
             displayUsers();
         })
 }
 
+/******************************************************************************
+ *                        Add, Edit, and Delete Users
+ ******************************************************************************/
 
-function httpGet(path) {
-    return fetch(path, getOptions('GET'))
+function logoutUser() {
+    Http.Get('/api/auth/logout')
+        .then(() => {
+            window.location.href = '/';
+        })
 }
-
-
-function httpPost(path, data) {
-    return fetch(path, getOptions('POST', data));
-}
-
-
-function httpPut(path, data) {
-    return fetch(path, getOptions('PUT', data));
-}
-
-
-function httpDelete(path) {
-    return fetch(path, getOptions('DELETE'));
-}
-
-
-function getOptions(verb, data) {
-    var options = {
-        dataType: 'json',
-        method: verb,
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    };
-    if (data) {
-        options.body = JSON.stringify(data);
-    }
-    return options;
-}
-
